@@ -1,11 +1,11 @@
-const TelegramApi = require('node-telegram-bot-api')
 const startServer = require('./src/db')
 const changeLang = require('./src/lang')
 const User = require('./src/userModel')
 const { downloadApi } = require('./requests')
+const TelegramBot = require('node-telegram-bot-api')
 require('dotenv').config()
 
-const bot = new TelegramApi(process.env.TELEGRAM_API, {polling: true});
+const bot = new TelegramBot(process.env.TELEGRAM_API, {polling: true});
 let lang
 const start = async () => {
     startServer()

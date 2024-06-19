@@ -52,7 +52,7 @@ const start = async () => {
             if (text !== '/start' && text?.includes('instagram.com/')) {
                 const search = await bot.sendMessage(chatId, '🔎')
                 const post = await downloadApi(msg.text)
-                if (post.length > 0) {
+                if (post?.length > 0) {
                     const video = post.filter(vid => vid.type === 'video')
                     const image = post.filter(img => img.type === 'photo')
                     if (image.length > 0 && video.length > 0) {

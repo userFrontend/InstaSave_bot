@@ -27,7 +27,7 @@ const language = {
         wiat: "Natijalar",
         loading: 'Havolaga ishlov berilmoqda, kuting...',
         info: `Salom`,
-        download: 'bilan yuklab olingan',
+        download: 'Yuklab beruvchi bot',
         help: 'Siz uni bot orqali yuklab olishingiz mumkin: \n• Instagram – istalgan formatdagi hikoyalar, postlar va IGTV!; \n🚀 Mediani yuklab olishni boshlash uchun havolani yuboring. \nAgarda taklif va shikoyatlaringiz bo\'lsa @Frontend_deveIoper ga aloqaga chiqishingiz mumkin',
         language: 'Til sozlamalari muvaffaqiyatli saqlandi'
     },

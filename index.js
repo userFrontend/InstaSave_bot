@@ -26,11 +26,10 @@ const start = async () => {
             {command: '/start', description: `${lang.commands.start}`},
             {command: '/language', description: `${lang.commands.setting}`},
             {command: '/help', description: `Help`},
-        ])
-        console.log(msg);
-        
+        ])   
+             
         try {
-            if(user.role === 'admin' && text === '/newMessage'){
+            if(user.role === 'admin' && !newMessage && text === '/newMessage'){
                 newMessage = true
                 newMess = await bot.sendMessage(chatId, lang.new, {
                     reply_markup: JSON.stringify({
@@ -44,23 +43,25 @@ const start = async () => {
             }
             if(newMessage && (msg.photo?.length > 0 || msg.video)){
                 media = msg.photo ? msg.photo : msg.video;   
-            
+                await bot.deleteMessage(chatId, msg.message_id)
                 await bot.sendMessage(chatId, `${msg.photo ? "Rasm" : 'Video'} saqlandi`, {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: 'Natijani ko\'rish', callback_data: 'getResult'}, {text: "Habarni jo'natish", callback_data: 'sendMessage'}],
+                            [{text: lang.result, callback_data: 'getResult'}, {text: lang.send, callback_data: 'sendMessage'}],
+                            [{text: lang.close, callback_data: 'close'}]
                         ]
                     })
                 });
                 return;
             }
             
-            if(newMessage){
+            if(newMessage && text !== '/newMessage'){
                 allMess = text; 
-                return   await bot.sendMessage(chatId, `So'z saqlandi`, {
+                return  await bot.sendMessage(chatId, `So'z saqlandi`, {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: 'Natijani ko\'rish', callback_data: 'getResult'}, {text: "Habarni jo'natish", callback_data: 'sendMessage'}],
+                            [{text: lang.result, callback_data: 'getResult'}, {text: lang.send, callback_data: 'sendMessage'}],
+                            [{text: lang.close, callback_data: 'close'}]
                         ]
                     })
                 });
@@ -153,18 +154,32 @@ const start = async () => {
             }
             if(newMessage && data === 'sendMessage'){
                 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+                const maxCaptionLength = 1024;
+                let caption = allMess;
                 const users = await User.find();
+                await bot.deleteMessage(chatId, msg.message.message_id)
+                if (caption.length > maxCaptionLength) {
+                    caption = caption.slice(0, maxCaptionLength) + '...';
+                }
             
-                for (const user of users) {
-                    if (user.chatId === chatId) {
-                        await bot.sendMessage(user.chatId, text);
+                for (const res of users) {
+                    if (res.user.first_name === '🌸🌸🌸') {
                         await delay(1000);
+                        if(media && media.mime_type === 'video/mp4') {
+                            await bot.sendVideo(res.chatId, media.file_id, {caption});
+                        }  else if(media) {
+                            await bot.sendPhoto(res.chatId, media[0].file_id, {caption: allMess});
+                        } else {
+                            await bot.sendMessage(res.chatId, allMess);
+                        }
                     }
                 }
             
                 newMessage = false;
+                media = null
+                allMess = ''
                 await bot.deleteMessage(chatId, newMess.message_id);
-                return await bot.sendMessage(chatId, `Xabar barcha ${users.length} ta foydalanuvchilarga jo'natildi`);
+                return await bot.sendMessage(chatId, `${lang.successResult} ${users.length}`);
             }
             if(newMessage && data === 'addVideo'){
                 return await bot.sendMessage(chatId, 'send video')
@@ -172,14 +187,14 @@ const start = async () => {
             if(newMessage && data === 'addPicture'){
                 return await bot.sendMessage(chatId, 'send image')
             }
-            if(newMessage && media && data === 'getResult'){
-                console.log(media);
-                if(media.mime_type && media.mime_type === 'video/mp4') {
+            if(newMessage && data === 'getResult'){
+                await bot.deleteMessage(chatId, msg.message.message_id)
+                if(media && media.mime_type && media.mime_type === 'video/mp4') {
                     return await bot.sendVideo(chatId, media.file_id, { 
                         caption: allMess,
                         reply_markup: JSON.stringify({
                             inline_keyboard: [
-                                [{text: "Habarni jo'natish", callback_data: 'sendMessage'}, {text: lang.close, callback_data: 'close'}],
+                                [{text: lang.send, callback_data: 'sendMessage'}, {text: lang.close, callback_data: 'close'}],
                             ]
                         })
                     });
@@ -189,25 +204,30 @@ const start = async () => {
                             caption: allMess, 
                             reply_markup: JSON.stringify({
                                 inline_keyboard: [
-                                    [{text: "Habarni jo'natish", callback_data: 'sendMessage'}, {text: "Yopish", callback_data: 'close'}],
+                                    [{text: lang.send, callback_data: 'sendMessage'}, {text: lang.close, callback_data: 'close'}],
                                 ]
                             })
                         });
                     }
                 }
+                return 
             }
-            if(newMessage && data === 'close'){
+            if(data === 'close'){
                 newMessage = false
-                if(newMess){
-                    await bot.deleteMessage(chatId, newMess.message_id)
-                    newMess = null
+                media = null
+                allMess = ''
+                newMess = null
+                if(lang){
+                    await bot.sendMessage(chatId, lang.successClose)
                 }
-                return await bot.sendMessage(chatId, lang.successClose)
+                return await bot.deleteMessage(chatId, msg.message.message_id)
             }
-            return await bot.sendMessage(chatId, lang.disabled)
+            return await bot.sendMessage(chatId, lang ? lang.disabled : 'Disabled')
         } catch (error) {
             console.log(error);
-            await bot.sendMessage(chatId, lang ? lang.error.textError : 'Error')
+            if(lang){
+                await bot.sendMessage(chatId, lang.error.textError)
+            }
             
         }
     })

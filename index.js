@@ -5,9 +5,11 @@ const { downloadApi } = require('./requests')
 const TelegramBot = require('node-telegram-bot-api')
 require('dotenv').config()
 
+const webAppUrl = 'https://web-effect.netlify.app/'
+
 const bot = new TelegramBot(process.env.TELEGRAM_API, {polling: true});
 const start = async () => {
-    startServer()
+    await startServer()
     let lang
     let newMess = null
     let allMess = ''
@@ -26,10 +28,11 @@ const start = async () => {
             {command: '/start', description: `${lang.commands.start}`},
             {command: '/language', description: `${lang.commands.setting}`},
             {command: '/help', description: `Help`},
+            {command: '/effect', description: `Test`},
         ])   
-             
+
         try {
-            if(user.role === 'admin' && !newMessage && text === '/newMessage'){
+            if(user?.role === 'admin' && !newMessage && text === '/newMessage'){
                 newMessage = true
                 newMess = await bot.sendMessage(chatId, lang.new, {
                     reply_markup: JSON.stringify({
@@ -64,6 +67,31 @@ const start = async () => {
                             [{text: lang.close, callback_data: 'close'}]
                         ]
                     })
+                });
+            }
+            if(text === '/effect'){
+                await bot.sendMessage(chatId, `Bu sayt test qilish uchun qo'shildi !`, {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{
+                                text: "Web ilovani ochish",
+                                web_app: { url: webAppUrl }
+                            }]
+                        ]
+                    }
+                });
+            }
+
+            if(text.includes('https://') && !text.includes('https://localhost:') && !text?.includes('instagram.com')){
+                await bot.sendMessage(chatId, `Siz tashlagan havolada ochish !`, {
+                    reply_markup: {
+                        inline_keyboard: [
+                            [{
+                                text: "Web ilovani ochish",
+                                web_app: { url: text }
+                            }]
+                        ]
+                    }
                 });
             }
             

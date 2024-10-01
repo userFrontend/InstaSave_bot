@@ -10,6 +10,10 @@ dotenv.config()
 const PORT = process.env.PORT || 4001;
 const server = http.createServer(app)
 
+app.get('/', (req, res) => {
+    res.send('Ok')
+})
+
 const startServer = async () => {
     try {
         mongoose.connect(process.env.MONGO_URL, {}).then(() => {

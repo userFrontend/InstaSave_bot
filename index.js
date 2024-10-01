@@ -16,6 +16,7 @@ const start = async () => {
     let media = null
     let newMessage = false
     bot.on('message', async msg => {
+        
         const text = msg.text;
         const chatId = msg.chat.id
         const user = await User.findOne({chatId})
@@ -25,20 +26,19 @@ const start = async () => {
             lang = changeLang('ru')
         }
         bot.setMyCommands([
-            {command: '/start', description: `${lang.commands.start}`},
-            {command: '/language', description: `${lang.commands.setting}`},
+            {command: '/start', description: `${lang?.commands?.start}`},
+            {command: '/language', description: `${lang?.commands?.setting}`},
             {command: '/help', description: `Help`},
-            {command: '/effect', description: `Test`},
-        ])   
-
+        ])  
+        
         try {
             if(user?.role === 'admin' && !newMessage && text === '/newMessage'){
                 newMessage = true
-                newMess = await bot.sendMessage(chatId, lang.new, {
+                newMess = await bot.sendMessage(chatId, lang?.new, {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: lang.addPic, callback_data: 'addPicture'}, {text: lang.addVid, callback_data: 'addVideo'}],
-                            [{text: lang.close, callback_data: 'close'}],
+                            [{text: lang?.addPic, callback_data: 'addPicture'}, {text: lang?.addVid, callback_data: 'addVideo'}],
+                            [{text: lang?.close, callback_data: 'close'}],
                         ]
                     })
                 })
@@ -50,8 +50,8 @@ const start = async () => {
                 await bot.sendMessage(chatId, `${msg.photo ? "Rasm" : 'Video'} saqlandi`, {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: lang.result, callback_data: 'getResult'}, {text: lang.send, callback_data: 'sendMessage'}],
-                            [{text: lang.close, callback_data: 'close'}]
+                            [{text: lang?.result, callback_data: 'getResult'}, {text: lang?.send, callback_data: 'sendMessage'}],
+                            [{text: lang?.close, callback_data: 'close'}]
                         ]
                     })
                 });
@@ -63,41 +63,28 @@ const start = async () => {
                 return  await bot.sendMessage(chatId, `So'z saqlandi`, {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
-                            [{text: lang.result, callback_data: 'getResult'}, {text: lang.send, callback_data: 'sendMessage'}],
-                            [{text: lang.close, callback_data: 'close'}]
+                            [{text: lang?.result, callback_data: 'getResult'}, {text: lang?.send, callback_data: 'sendMessage'}],
+                            [{text: lang?.close, callback_data: 'close'}]
                         ]
                     })
                 });
             }
-            if(text === '/effect'){
-                await bot.sendMessage(chatId, `Bu sayt test qilish uchun qo'shildi !`, {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [{
-                                text: "Web ilovani ochish",
-                                web_app: { url: webAppUrl }
-                            }]
-                        ]
-                    }
-                });
-            }
-
-            if(text.includes('https://') && !text.includes('https://localhost:') && !text?.includes('instagram.com')){
-                await bot.sendMessage(chatId, `Siz tashlagan havolada ochish !`, {
-                    reply_markup: {
-                        inline_keyboard: [
-                            [{
-                                text: "Web ilovani ochish",
-                                web_app: { url: text }
-                            }]
-                        ]
-                    }
-                });
-            }
+            // if(text.includes('https://') && !text.includes('https://localhost:') && !text?.includes('instagram.com')){
+            //     await bot.sendMessage(chatId, `Siz tashlagan havolada ochish !`, {
+            //         reply_markup: {
+            //             inline_keyboard: [
+            //                 [{
+            //                     text: "Web ilovani ochish",
+            //                     web_app: { url: text }
+            //                 }]
+            //             ]
+            //         }
+            //     });
+            // }
             
             if(text === '/start'){
                 if(!user){
-                    await bot.sendPhoto(chatId, './logo.jpg',{caption: `${lang.info} ${msg.from.first_name} ${lang.contact} \nВыберите первый язык`,
+                    await bot.sendPhoto(chatId, './logo.jpg',{caption: `${lang?.info} ${msg.from.first_name} ${lang?.contact} \nВыберите первый язык`,
                         reply_markup: JSON.stringify({
                             inline_keyboard: [
                                 [{text: '🇺🇸 EN', callback_data: 'en'}, {text: '🇷🇺 RU', callback_data: 'ru'} , {text: '🇺🇿 Uz', callback_data: 'uz'}],
@@ -106,13 +93,13 @@ const start = async () => {
                     })
                     return (await User.create({chatId, lang: msg.from.language_code, user: msg.chat})).save()
                 }
-                await bot.sendPhoto(chatId, './logo.jpg', {caption: `${lang.info} ${msg.from.first_name} \n${lang.contact}`})
+                await bot.sendPhoto(chatId, './logo.jpg', {caption: `${lang?.info} ${msg.from.first_name} \n${lang?.contact}`})
             }
             if (text === '/help') {
-                await bot.sendMessage(chatId, `${lang.help}`)
+                await bot.sendMessage(chatId, `${lang?.help}`)
             } 
             if (text === '/language') {
-                await bot.sendMessage(chatId, `${lang.success}`, {
+                await bot.sendMessage(chatId, `${lang?.success}`, {
                     reply_markup: JSON.stringify({
                         inline_keyboard: [
                             [{text: '🇺🇸 EN', callback_data: 'en'}, {text: '🇷🇺 RU', callback_data: 'ru'} , {text: '🇺🇿 Uz', callback_data: 'uz'}],
@@ -130,7 +117,7 @@ const start = async () => {
                         const mediaGroup = post.map(img => ({
                             type: img.type,
                             media: img.url,
-                            caption: `📥 ${lang.download} @Instagram_ProBot`, // Only the first photo can have a caption
+                            caption: `📥 ${lang?.download} @Instagram_ProBot`, // Only the first photo can have a caption
                         }));
                         await bot.deleteMessage(chatId, search.message_id)
                         return await bot.sendMediaGroup(chatId, mediaGroup )
@@ -138,7 +125,7 @@ const start = async () => {
                         const mediaGroup = image.map(img => ({
                             type: 'photo',
                             media: img.url,
-                            caption: `📥 ${lang.download} @Instagram_ProBot`, // Only the first photo can have a caption
+                            caption: `📥 ${lang?.download} @Instagram_ProBot`, // Only the first photo can have a caption
                         }));
                         await bot.deleteMessage(chatId, search.message_id)
                         return await bot.sendMediaGroup(chatId, mediaGroup )
@@ -146,17 +133,17 @@ const start = async () => {
                         const mediaGroup = video.map(vid => ({
                             type: 'video',
                             media: vid.url,
-                            caption: `📥 ${lang.download} @Instagram_ProBot`, // Only the first photo can have a caption
+                            caption: `📥 ${lang?.download} @Instagram_ProBot`, // Only the first photo can have a caption
                         }));
                         await bot.deleteMessage(chatId, search.message_id)
                         return await bot.sendMediaGroup(chatId, mediaGroup )
                     } else {
                         await bot.deleteMessage(chatId, search.message_id)
-                        await bot.sendMessage(chatId, lang.error.error)
+                        await bot.sendMessage(chatId, lang?.error.error)
                     }  
                 } else {
                     await bot.deleteMessage(chatId, search.message_id)
-                    return await bot.sendMessage(chatId, lang.error.infoError)
+                    return await bot.sendMessage(chatId, lang?.error?.infoError)
                 }
             } 
         } catch (error) {
@@ -177,7 +164,7 @@ const start = async () => {
                     const setLang = changeLang(data)
                     user.lang = data
                     await User.findByIdAndUpdate(user._id, user, {new: true})
-                    return await bot.sendMessage(chatId, setLang.language)
+                    return await bot.sendMessage(chatId, setLang?.language)
                 }
             }
             if(newMessage && data === 'sendMessage'){
@@ -207,7 +194,7 @@ const start = async () => {
                 media = null
                 allMess = ''
                 await bot.deleteMessage(chatId, newMess.message_id);
-                return await bot.sendMessage(chatId, `${lang.successResult} ${users.length}`);
+                return await bot.sendMessage(chatId, `${lang?.successResult} ${users.length}`);
             }
             if(newMessage && data === 'addVideo'){
                 return await bot.sendMessage(chatId, 'send video')
@@ -222,7 +209,7 @@ const start = async () => {
                         caption: allMess,
                         reply_markup: JSON.stringify({
                             inline_keyboard: [
-                                [{text: lang.send, callback_data: 'sendMessage'}, {text: lang.close, callback_data: 'close'}],
+                                [{text: lang?.send, callback_data: 'sendMessage'}, {text: lang?.close, callback_data: 'close'}],
                             ]
                         })
                     });
@@ -232,7 +219,7 @@ const start = async () => {
                             caption: allMess, 
                             reply_markup: JSON.stringify({
                                 inline_keyboard: [
-                                    [{text: lang.send, callback_data: 'sendMessage'}, {text: lang.close, callback_data: 'close'}],
+                                    [{text: lang?.send, callback_data: 'sendMessage'}, {text: lang?.close, callback_data: 'close'}],
                                 ]
                             })
                         });
@@ -246,15 +233,15 @@ const start = async () => {
                 allMess = ''
                 newMess = null
                 if(lang){
-                    await bot.sendMessage(chatId, lang.successClose)
+                    await bot.sendMessage(chatId, lang?.successClose)
                 }
                 return await bot.deleteMessage(chatId, msg.message.message_id)
             }
-            return await bot.sendMessage(chatId, lang ? lang.disabled : 'Disabled')
+            return await bot.sendMessage(chatId, lang ? lang?.disabled : 'Disabled')
         } catch (error) {
             console.log(error);
             if(lang){
-                await bot.sendMessage(chatId, lang.error.textError)
+                await bot.sendMessage(chatId, lang?.error?.textError)
             }
             
         }

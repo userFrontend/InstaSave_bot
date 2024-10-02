@@ -167,8 +167,6 @@ const start = async () => {
                     return await bot.sendMessage(chatId, setLang?.language)
                 }
             }
-
-            
             if(newMessage && data === 'sendMessage'){
                 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
                 const maxCaptionLength = 1024;
